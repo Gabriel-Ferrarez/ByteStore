@@ -7,14 +7,25 @@
 </head>
 <body>
     <div class="container">
-        <h2>Cadastro</h2>
-        <form id="cadastroForm">
-            <input type="text" id="nome" placeholder="Nome Completo" required>
-            <input type="email" id="email" placeholder="E-mail" required>
-            <input type="password" id="senha" placeholder="Senha" required>
-            <button type="submit">Cadastrar</button>
-        </form>
-        <button id="loginRedirect" class="secondary-button">Tem conta? Clique aqui</button>
+        <h2>Cadastro Byte Store</h2>
+            <form id="cadastroForm">
+                <div class="form-grid">
+                    <input type="text" id="nome" placeholder="Nome Completo" required>
+                    <input type="text" id="CPF" placeholder="CPF" required>
+                    <input type="email" id="email" placeholder="E-mail" required>
+                    <input type="date" id="nascimento" placeholder="Nascimento" required>
+                    <input type="text" id="endereco" placeholder="Endereço" required>
+                    <input type="number" id="numero" placeholder="Número" required>
+                    <input type="text" id="complemento" placeholder="Complemento" required>
+                    <input type="text" id="bairro" placeholder="Bairro" required>
+                    <input type="text" id="cidade" placeholder="Cidade" required>
+                    <input type="text" id="estado" placeholder="Estado" required>
+                    <input type="password" id="senha" placeholder="Senha" required>
+                    <input type="password" id="confirmarSenha" placeholder="Confirmar senha" required>
+                </div>
+                <button type="submit">Cadastrar</button>
+            </form>
+        <button id="loginRedirect" class="secondary-button">Já possui conta? Clique aqui</button>
     </div>
     
     <script src="cadastro.js"></script>
