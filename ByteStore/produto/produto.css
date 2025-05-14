@@ -1,0 +1,101 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.header {
+  background-color: #2d00f7;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  align-items: center;
+}
+
+.header .logo a {
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  text-decoration: none;
+}
+
+.header .login a {
+  color: white;
+  text-decoration: none;
+}
+
+.product-container {
+  display: flex;
+  padding: 30px;
+  gap: 30px;
+  background-color: white;
+}
+
+.image-section img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.thumbnails img {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.details-section h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.rating {
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 28px;
+  color: #4CAF50;
+  margin-bottom: 15px;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+}
+
+.cart {
+  background-color: #666;
+}
+
+.buy {
+  background-color: #2d00f7;
+}
+
+.description {
+  padding: 30px;
+}
+
+.description h2, .description h3 {
+  margin-top: 20px;
+}

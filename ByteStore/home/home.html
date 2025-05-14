@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Home - Byte Store</title>
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -11,29 +11,19 @@
 <body>
 
     <header>
-        <div class="header-row">
-            <div class="logo">
-                <img src="../images/logo.jpg" alt="Logo" />
-            </div>
-            <div class="search-bar">
-                <span class="menu-text" id="menuToggle"><i class="fa-solid fa-bars"></i></span>
-                <input type="text" id="search" placeholder="Buscar produtos..." />
-                <div class="menu-dropdown" id="menuDropdown">
-                    <ul>
-                        <li><a href="#">Categorias</a></li>
-                        <li><a href="#">Sobre nós</a></li>
-                        <li><a href="#">Perfil</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="header-links">
-                <nav>
-                </nav>
-                <span class="login-link" id="loginLink">
-                    <strong>Entre</strong> ou<br><strong>cadastre-se</strong>
-                </span>
-            </div>
+        <div class="logo">
+            <img src="logo.png" alt="Logo" />
         </div>
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Buscar produtos..." />
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Categoria</a></li>
+                <li><a href="#">Quem somos nós</a></li>
+                <li><a href="#">Perfil</a></li>
+            </ul>
+        </nav>
     </header>
 
     <main>
@@ -41,15 +31,15 @@
             <h2>Produtos em destaque</h2>
             <div class="products">
                 <div class="product">
-                    <img src="product1.jpg" alt="Produto 1" />
-                    <p>Produto 1</p>
+                    <img src="produto1.jpg" alt="Produto 1"/>
+                    <p><a href="/ByteStore/ByteStore/produto/produto.html">RTX 4080</a></p>
                 </div>
                 <div class="product">
-                    <img src="product2.jpg" alt="Produto 2" />
+                    <img src="produto2.jpg" alt="Produto 2" />
                     <p>Produto 2</p>
                 </div>
                 <div class="product">
-                    <img src="product3.jpg" alt="Produto 3" />
+                    <img src="produto.jpg" alt="Produto 3" />
                     <p>Produto 3</p>
                 </div>
             </div>
