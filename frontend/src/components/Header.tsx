@@ -1,29 +1,39 @@
+import { FaShoppingCart } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
+
 export function Header() {
-    return (
-        <header className="bg-blue-500 w-full pl-1 pr-4 py-4">
+  return (
+    <header className="bg-blue-500 w-full py-4">
+      <div className="mx-auto px-4 flex items-center justify-between h-16">
 
-            <div className="max-w-screen-xl mx-auto flex items-center justify-between">
-                {/* Título à esquerda */}
-                <h1 className="text-white text-2xl font-bold">BYTE STORE</h1>
+        <div>
+          <h1 className="text-white text-2xl font-bold">BYTE STORE</h1>
+        </div>
 
-                {/* Conteúdo central (busca e menu) */}
-                <div className="flex flex-col items-center justify-center flex-1">
-                    <input
-                        type="text"
-                        placeholder="Buscar produtos..."
-                        className="px-3 py-2 w-full max-w-md rounded-lg bg-zinc-100 text-black mb-2"
-                    />
-                    <nav>
-                        <ul className="flex gap-3 text-sm font-semibold text-white">
-                            <li><a href="#">CATEGORIA</a></li>
-                            <li>|</li>
-                            <li><a href="#">QUEM SOMOS NÓS</a></li>
-                            <li>|</li>
-                            <li><a href="#">PERFIL</a></li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </header>
-    );
+        <div className="flex-grow max-w-md mx-4">
+          <input
+            type="text"
+            placeholder="Buscar produtos..."
+            className="px-4 py-2 w-full rounded-lg bg-zinc-100 text-black shadow"
+          />
+        </div>
+
+        <nav className="flex items-center ">
+          {/* Links (Início, Categorias, Quem Somos Nós) */}
+          <ul className="flex gap-4 text-sm font-semibold text-white items-center ">
+            <li><a href="#">INÍCIO</a></li>
+            <li>|</li>
+            <li><a href="#">CATEGORIAS</a></li>
+            <li>|</li>
+            <li><a href="#">QUEM SOMOS NÓS</a></li>
+          </ul>
+
+          <div className="flex gap-4 ml-6">
+            <a href="#"><FaUser size={24} className="text-white" /></a>
+            <a href="#"><FaShoppingCart size={28} className="text-white" /></a>
+          </div>
+        </nav>
+      </div>
+    </header>
+  );
 }

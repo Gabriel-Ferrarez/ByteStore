@@ -14,7 +14,7 @@ export function App() {
 export function Footer() {
   return (
     <footer className="bg-zinc-500 text-white h-10 flex justify-center items-center w-full">
-      <p>&copy; 2025 Seu Site. Todos os direitos reservados.</p>
+      <p>&copy; 2025 Byte Store. Todos os direitos reservados.</p>
     </footer>
   )
 }
