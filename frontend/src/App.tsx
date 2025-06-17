@@ -2,10 +2,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Cadastro } from "./pages/Cadastro";
 import {Login} from "./pages/Login";
-import {Carrinho} from "./pages/Carrinho"
+import {Produto} from "./pages/Produto"
+import { Carrinho } from "./pages/Carrinho";
+import { Pagamento } from "./pages/Pagamento";
+import { Endereco } from "./pages/Endereco";
 
 export function App() {
-  return <Carrinho/>;(
+  return <Endereco/>;(
     <BrowserRouter>
       <Routes>
         <Route path="*" element={<Home />} />
