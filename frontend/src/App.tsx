@@ -6,9 +6,10 @@ import {Produto} from "./pages/Produto"
 import { Carrinho } from "./pages/Carrinho";
 import { Pagamento } from "./pages/Pagamento";
 import { Endereco } from "./pages/Endereco";
+import { Comprovante } from "./pages/Comprovante";
 
 export function App() {
-  return <Endereco/>;(
+  return <Comprovante/>;(
     <BrowserRouter>
       <Routes>
         <Route path="*" element={<Home />} />
