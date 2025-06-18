@@ -1,0 +1,34 @@
+# Dependencies do Node.js
+**/node_modules/
+package-lock.json
+backend/package-lock.json
+
+# Variáveis de ambiente
+.env
+.env.local
+.env*.local
+
+# Logs e arquivos temporários
+logs/
+*.log
+npm-debug.log*
+*.tmp
+*.temp
+
+# Arquivos de IDE/Editor
+.idea/
+.vscode/
+*.sup
+
+# Pastas de build
+dist/
+build/
+out/
+coverage/
+
+# Outros
+.DS_Store
+Thumbs.db
+
+.env
+.env.local
