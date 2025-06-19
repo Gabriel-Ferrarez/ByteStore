@@ -1,6 +1,20 @@
 import { Footer } from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
+
 
 export function Perfil() {
+
+    const navigate = useNavigate();
+
+function handleLogout() {
+  // Limpa os dados do localStorage (caso tenha login salvo)
+  localStorage.removeItem('usuario');
+
+  // Redireciona para a tela de login
+  navigate('/login');
+}
+
+
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
          
@@ -67,9 +81,13 @@ export function Perfil() {
                             <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                             Editar perfil
                             </button>
-                            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                            Sair
-                            </button>
+                            <button
+  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+  onClick={handleLogout}
+>
+  Sair
+</button>
+
                         </div>
                     </div>
                 </div>
