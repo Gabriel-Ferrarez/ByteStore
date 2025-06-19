@@ -1,5 +1,4 @@
 import { Footer } from '../components/Footer'
-import { Header } from '../components/Header'
 
 
 export function Home() {
@@ -59,7 +58,7 @@ export function Home() {
     return (
         <div className='flex flex-col items-center'>
 
-            <Header />
+    
 
             <div className="flex flex-col gap-8 p-8 w-[75%]">
                 <h1 className='text-4xl font-bold'>Produtos em destaque</h1>

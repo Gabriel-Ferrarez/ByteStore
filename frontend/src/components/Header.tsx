@@ -1,5 +1,6 @@
 import { FaShoppingCart } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; 
 
 export function Header() {
   return (
@@ -18,19 +19,18 @@ export function Header() {
           />
         </div>
 
-        <nav className="flex items-center ">
-          {/* Links (Início, Categorias, Quem Somos Nós) */}
-          <ul className="flex gap-4 text-sm font-semibold text-white items-center ">
-            <li><a href="#">INÍCIO</a></li>
+        <nav className="flex items-center">
+          <ul className="flex gap-4 text-sm font-semibold text-white items-center">
+            <li><Link to="/">INÍCIO</Link></li>
             <li>|</li>
-            <li><a href="#">CATEGORIAS</a></li>
+            <li><Link to="/categorias">CATEGORIAS</Link></li>
             <li>|</li>
-            <li><a href="#">QUEM SOMOS NÓS</a></li>
+            <li><Link to="#">QUEM SOMOS NÓS</Link></li> {}
           </ul>
 
           <div className="flex gap-4 ml-6">
-            <a href="#"><FaUser size={24} className="text-white" /></a>
-            <a href="#"><FaShoppingCart size={28} className="text-white" /></a>
+            <Link to="/login"><FaUser size={24} className="text-white" /></Link>
+            <Link to="/carrinho"><FaShoppingCart size={28} className="text-white" /></Link>
           </div>
         </nav>
       </div>
