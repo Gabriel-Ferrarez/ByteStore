@@ -1,6 +1,8 @@
 import { FaShoppingCart } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
+import { Dropdown } from '../components/Dropdown';
+
 
 export function Header() {
   return (
@@ -23,15 +25,20 @@ export function Header() {
           <ul className="flex gap-4 text-sm font-semibold text-white items-center">
             <li><Link to="/">INÍCIO</Link></li>
             <li>|</li>
-            <li><Link to="/categorias">CATEGORIAS</Link></li>
+            <Dropdown/>
             <li>|</li>
-            <li><Link to="#">QUEM SOMOS NÓS</Link></li> {}
+            <div>
+            <Link to="/Quemsomosnos">QUEM SOMOS NÓS</Link>
+            </div>
           </ul>
 
           <div className="flex gap-4 ml-6">
-            <Link to="/login"><FaUser size={24} className="text-white" /></Link>
+            <Link to="/perfil"><FaUser size={24} className="text-white" /></Link>
             <Link to="/carrinho"><FaShoppingCart size={28} className="text-white" /></Link>
           </div>
+          {
+  
+}
         </nav>
       </div>
     </header>
