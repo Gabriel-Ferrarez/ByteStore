@@ -1,10 +1,10 @@
-import { FaShoppingCart } from 'react-icons/fa';
-import { FaUser } from 'react-icons/fa';
+import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { Dropdown } from '../components/Dropdown';
 
-
 export function Header() {
+  const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
+
   return (
     <header className="bg-blue-500 w-full py-4">
       <div className="mx-auto px-4 flex items-center justify-between h-16">
@@ -25,20 +25,22 @@ export function Header() {
           <ul className="flex gap-4 text-sm font-semibold text-white items-center">
             <li><Link to="/">INÍCIO</Link></li>
             <li>|</li>
-            <Dropdown/>
+            <li><Dropdown /></li>
             <li>|</li>
-            <div>
-            <Link to="/Quemsomosnos">QUEM SOMOS NÓS</Link>
-            </div>
+            <li><Link to="/quemsomosnos">QUEM SOMOS NÓS</Link></li>
+
+            {usuario?.tipo === 'administrador' && (
+              <>
+                <li>|</li>
+                <li><Link to="/cadastro-produto">CADASTRAR PRODUTO</Link></li>
+              </>
+            )}
           </ul>
 
           <div className="flex gap-4 ml-6">
             <Link to="/perfil"><FaUser size={24} className="text-white" /></Link>
             <Link to="/carrinho"><FaShoppingCart size={28} className="text-white" /></Link>
           </div>
-          {
-  
-}
         </nav>
       </div>
     </header>
