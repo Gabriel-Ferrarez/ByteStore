@@ -1,72 +1,121 @@
+import { useState } from 'react';
 import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
+import { Link } from 'react-router-dom';
 
-export function Comprovante() {
+export function Carrinho() {
+    const [cartItems, setCartItems] = useState<any[]>(() => {
+        const savedCart = localStorage.getItem('carrinho');
+        return savedCart ? JSON.parse(savedCart) : [];
+    });
+
+    const calculateTotal = () => {
+        return cartItems.reduce((total, item) => total + (item.valor * item.quantidade), 0);
+    };
+
+    const updateQuantity = (index: number, newQuantity: number) => {
+        if (newQuantity < 1) return;
+        
+        const updatedItems = [...cartItems];
+        updatedItems[index].quantidade = newQuantity;
+        setCartItems(updatedItems);
+        localStorage.setItem('carrinho', JSON.stringify(updatedItems));
+    };
+
+    const removeItem = (index: number) => {
+        const updatedItems = cartItems.filter((_, i) => i !== index);
+        setCartItems(updatedItems);
+        localStorage.setItem('carrinho', JSON.stringify(updatedItems));
+    };
+
     return (
-        <div className='flex flex-col items-center min-h-screen'>
-            <Header />
-
-            <div className="flex flex-col gap-8 p-8 w-full max-w-4xl flex-grow">
-                <h1 className='text-4xl font-bold text-center'>BYTE STORE</h1>
-                <h2 className='text-2xl text-gray-600 text-center'>Comprovante de Compra</h2>
-
-                <div className="flex flex-col gap-8 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-                    <div className="border-b pb-6">
-                        <h3 className="text-xl font-semibold mb-4">Itens do Pedido</h3>
-                        <div className="flex justify-between items-center py-2">
-                            <p className="text-gray-500">[Nome do produto] [Quantidade]x</p>
-                            <p className="font-medium text-gray-500">R$ [0,00]</p>
+        <div className='flex flex-col items-center'>
+            <div className="flex flex-col gap-8 p-8 w-[75%]">
+                <h1 className='text-4xl font-bold'>Seu Carrinho</h1>
+                
+                {cartItems.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16">
+                        <p className="text-xl text-gray-500">Seu carrinho está vazio</p>
+                        <Link to="/" className="mt-4 text-blue-500 hover:text-blue-700">
+                            Voltar para a loja
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-6">
+                        <div className="border-b border-gray-200 pb-4">
+                            {cartItems.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center py-4">
+                                    <div className="flex items-center gap-4">
+                                        <img 
+                                            src={item.imagem_url || "https://via.placeholder.com/80"} 
+                                            alt={item.nome} 
+                                            className="w-20 h-20 object-cover rounded"
+                                        />
+                                        <div>
+                                            <p className="font-medium">{item.nome}</p>
+                                            <p className="text-sm text-gray-500">{item.descricao}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                className="px-2 py-1 border rounded"
+                                                onClick={() => updateQuantity(index, item.quantidade - 1)}
+                                            >
+                                                -
+                                            </button>
+                                            <span>{item.quantidade}</span>
+                                            <button 
+                                                className="px-2 py-1 border rounded"
+                                                onClick={() => updateQuantity(index, item.quantidade + 1)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                        <p className="font-bold">
+                                            {item.valor.toLocaleString('pt-BR', {
+                                                style: 'currency',
+                                                currency: 'BRL'
+                                            })}
+                                        </p>
+                                        <button 
+                                            className="text-red-500"
+                                            onClick={() => removeItem(index)}
+                                        >
+                                            Remover
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-end">
+                            <div className="flex flex-col gap-4 bg-gray-50 p-6 rounded-lg w-80">
+                                <h2 className="text-xl font-bold">Resumo do Pedido</h2>
+                                <div className="flex justify-between">
+                                    <span>Subtotal</span>
+                                    <span>
+                                        {calculateTotal().toLocaleString('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL'
+                                        })}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between font-bold text-lg">
+                                    <span>Total</span>
+                                    <span>
+                                        {calculateTotal().toLocaleString('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL'
+                                        })}
+                                    </span>
+                                </div>
+                                <button className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+                                    Finalizar Compra
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div className="border-b pb-6">
-                        <h3 className="text-xl font-semibold mb-4">Forma de Pagamento</h3>
-                        <p className="text-gray-500">[Método de pagamento]</p>
-                    </div>
-                    <div className="border-b pb-6">
-                        <h3 className="text-xl font-semibold mb-4">Endereço de Entrega</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p><span className="font-medium">Nome:</span> <span className="text-gray-500">[Nome do destinatário]</span></p>
-                                <p><span className="font-medium">Endereço:</span> <span className="text-gray-500">[Rua, número]</span></p>
-                            </div>
-                            <div>
-                                <p><span className="font-medium">Complemento:</span> <span className="text-gray-500">[Complemento]</span></p>
-                                <p><span className="font-medium">Bairro:</span> <span className="text-gray-500">[Bairro]</span></p>
-                                <p><span className="font-medium">CEP:</span> <span className="text-gray-500">[CEP]</span></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-semibold mb-4">Resumo do Pedido</h3>
-                        <div className="space-y-2">
-                            <div className="flex justify-between">
-                                <p>Subtotal:</p>
-                                <p className="text-gray-500">R$ [0,00]</p>
-                            </div>
-                            <div className="flex justify-between text-green-600">
-                                <p>Desconto:</p>
-                                <p>- R$ [0,00]</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p>Frete:</p>
-                                <p>Grátis</p>
-                            </div>
-                            <div className="flex justify-between border-t pt-2 mt-2 text-lg font-bold">
-                                <p>Total:</p>
-                                <p>R$ [0,00]</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex justify-center mt-8">
-                        <button 
-                            className="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition"
-                        >
-                            Voltar à Home
-                        </button>
-                    </div>
-                </div>
+                )}
             </div>
-
             <Footer />
         </div>
     );
