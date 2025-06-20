@@ -309,3 +309,104 @@ app.get('/usuario/:id', async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar usuário' });
   }
 });
+
+// Rota para obter os pedidos do usuário
+app.get('/usuario/:id/pedidos', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Busca os pedidos do usuário (sem valor_total)
+        const [pedidos] = await db.query(`
+            SELECT p.id, p.data_pedido, p.status, p.forma_pagamento, p.endereco_entrega
+            FROM pedidos p
+            WHERE p.usuario_id = ?
+            ORDER BY p.data_pedido DESC
+            LIMIT 5
+        `, [id]);
+
+        // Para cada pedido, busca os itens e calcula o total
+        for (const pedido of pedidos) {
+            const [itens] = await db.query(`
+                SELECT pi.quantidade, pi.preco_unitario, pr.nome 
+                FROM pedido_itens pi
+                JOIN produtos pr ON pi.produto_id = pr.id
+                WHERE pi.pedido_id = ?
+            `, [pedido.id]);
+            
+            // Calcula o valor total somando os itens
+            pedido.valor_total = itens.reduce((total, item) => {
+                return total + (item.preco_unitario * item.quantidade);
+            }, 0);
+            
+            pedido.itens = itens;
+        }
+
+        res.json(pedidos);
+    } catch (error) {
+        console.error('Erro ao buscar pedidos:', error);
+        res.status(500).json({ error: 'Erro ao buscar pedidos' });
+    }
+});
+
+// Rota para criar um novo pedido
+app.post('/pedidos', async (req, res) => {
+    try {
+        const { usuario_id, itens, endereco_entrega, forma_pagamento } = req.body;
+        
+        // Validação básica
+        if (!usuario_id || !itens || !Array.isArray(itens) || itens.length === 0) {
+            return res.status(400).json({ error: 'Dados do pedido inválidos' });
+        }
+
+        const conn = await db.getConnection();
+        await conn.beginTransaction();
+
+        try {
+            // 1. Cria o pedido principal
+            const [pedidoResult] = await conn.query(
+                `INSERT INTO pedidos 
+                (usuario_id, endereco_entrega, forma_pagamento, status) 
+                VALUES (?, ?, ?, 'pendente')`,
+                [usuario_id, endereco_entrega, forma_pagamento]
+            );
+            
+            const pedido_id = pedidoResult.insertId;
+            let valor_total = 0;
+
+            // 2. Insere os itens do pedido
+            for (const item of itens) {
+                await conn.query(
+                    `INSERT INTO pedido_itens 
+                    (pedido_id, produto_id, quantidade, preco_unitario) 
+                    VALUES (?, ?, ?, ?)`,
+                    [pedido_id, item.id, item.quantidade, item.valor]
+                );
+                valor_total += item.valor * item.quantidade;
+            }
+
+            // 3. Atualiza o valor total do pedido (se você adicionou essa coluna)
+            await conn.query(
+                `UPDATE pedidos SET valor_total = ? WHERE id = ?`,
+                [valor_total, pedido_id]
+            );
+
+            await conn.commit();
+            conn.release();
+
+            res.json({ 
+                success: true,
+                pedido_id,
+                valor_total
+            });
+
+        } catch (error) {
+            await conn.rollback();
+            conn.release();
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('Erro ao criar pedido:', error);
+        res.status(500).json({ error: 'Erro ao criar pedido' });
+    }
+});

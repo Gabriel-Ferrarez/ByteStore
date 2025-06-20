@@ -23,11 +23,27 @@ interface Cliente {
     complemento?: string;
 }
 
+interface Pedido {
+    id: number;
+    data_pedido: string;
+    status: string;
+    valor_total: number;
+    itens: {
+        nome: string;
+        quantidade: number;
+        preco_unitario: number;
+    }[];
+}
+
 export function Perfil() {
     const navigate = useNavigate();
     const [usuario, setUsuario] = useState<Usuario | null>(null);
     const [cliente, setCliente] = useState<Cliente | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [pedidos, setPedidos] = useState<Pedido[]>([]);
+    const [loading, setLoading] = useState({
+        usuario: true,
+        pedidos: true
+    });
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('usuario') || 'null');
@@ -43,14 +59,27 @@ export function Perfil() {
             try {
                 const response = await axios.get(`http://localhost:3001/usuario/${user.id}`);
                 setCliente(response.data.cliente);
+                setLoading(prev => ({ ...prev, usuario: false }));
             } catch (error) {
                 console.error('Erro ao buscar detalhes do usuário:', error);
-            } finally {
-                setLoading(false);
+                setLoading(prev => ({ ...prev, usuario: false }));
+            }
+        }
+
+        // Buscar pedidos do usuário
+        async function fetchUserOrders() {
+            try {
+                const response = await axios.get(`http://localhost:3001/usuario/${user.id}/pedidos`);
+                setPedidos(response.data);
+                setLoading(prev => ({ ...prev, pedidos: false }));
+            } catch (error) {
+                console.error('Erro ao buscar pedidos:', error);
+                setLoading(prev => ({ ...prev, pedidos: false }));
             }
         }
 
         fetchUserDetails();
+        fetchUserOrders();
     }, [navigate]);
 
     function handleLogout() {
@@ -59,11 +88,20 @@ export function Perfil() {
         navigate('/login');
     }
 
+    function formatDate(dateString: string) {
+        const options: Intl.DateTimeFormatOptions = { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        };
+        return new Date(dateString).toLocaleDateString('pt-BR', options);
+    }
+
     if (!usuario) {
         return null;
     }
 
-    if (loading) {
+    if (loading.usuario || loading.pedidos) {
         return (
             <div className="flex flex-col min-h-screen bg-gray-100">
                 <main className="flex-grow container mx-auto px-4 py-8">
@@ -138,20 +176,58 @@ export function Perfil() {
                         */}
 
                         <section>
-                            <h3 className="text-lg font-bold mb-2">Últimos pedidos</h3>
+                           <h3 className="text-lg font-bold mb-2">Últimos pedidos</h3>
+                    {pedidos.length === 0 ? (
                             <div className="text-sm text-gray-700">
-                                <p>Nenhum pedido realizado</p>
-                                {/* <p className="text-blue-600 mt-1 cursor-pointer hover:underline">Ver todos os pedidos</p> */}
-                            </div>
-                        </section>
+                            <p>Nenhum pedido encontrado. Faça seu primeiro pedido!</p>
+                            <Link to="/" className="text-blue-600 hover:underline">
+                                Ir para a loja
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {pedidos.map((pedido) => (
+                                <div key={pedido.id} className="border rounded-lg p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <p className="font-semibold">Pedido #{pedido.id}</p>
+                                            <p className="text-sm text-gray-600">
+                                                {formatDate(pedido.data_pedido)} - {pedido.status}
+                                            </p>
+                                        </div>
+                                        <p className="font-bold">
+                                            {pedido.valor_total.toLocaleString('pt-BR', {
+                                                style: 'currency',
+                                                currency: 'BRL'
+                                            })}
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="mt-2 border-t pt-2">
+                                        <h4 className="text-sm font-medium mb-1">Itens:</h4>
+                                        <ul className="text-sm space-y-1">
+                                            {pedido.itens.map((item, index) => (
+                                                <li key={index}>
+                                                    {item.quantidade}x {item.nome} - 
+                                                    {(item.preco_unitario * item.quantidade).toLocaleString('pt-BR', {
+                                                        style: 'currency',
+                                                        currency: 'BRL'
+                                                    })}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            ))}
+                            <p className="text-blue-600 mt-1 cursor-pointer hover:underline">
+                                Ver todos os pedidos
+                            </p>
+                        </div>
+                    )}
+                </section>
+
 
                         <div className="mt-4 flex gap-2">
-                            <button 
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                onClick={() => alert('Funcionalidade de edição em desenvolvimento')}
-                            >
-                                Editar perfil
-                            </button>
                             <button
                                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                 onClick={handleLogout}

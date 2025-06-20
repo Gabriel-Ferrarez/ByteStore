@@ -1,6 +1,7 @@
 import { Footer } from '../components/Footer';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export function Endereco() {
     const navigate = useNavigate();
@@ -12,6 +13,12 @@ export function Endereco() {
         numero: '',
         bairro: '',
         complemento: ''
+    });
+
+    // Obter itens do carrinho do localStorage ou do state da rota
+    const [cartItems, setCartItems] = useState<any[]>(() => {
+        const savedCart = localStorage.getItem('carrinho');
+        return savedCart ? JSON.parse(savedCart) : [];
     });
 
     const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +35,7 @@ export function Endereco() {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         if (cep.length !== 8) {
@@ -41,24 +48,56 @@ export function Endereco() {
             return;
         }
 
-        const cartItems = location.state?.cartItems || [];
-        const total = cartItems.reduce(
-            (sum: number, item: any) => sum + (item.valor * item.quantidade), 0
-        );
+        const user = JSON.parse(localStorage.getItem('usuario') || 'null');
+        if (!user) {
+            alert('Usuário não autenticado');
+            return;
+        }
 
-        navigate('/comprovante', {
-            state: {
-                cliente: {
-                    nome: formData.nome
-                },
-                endereco: {
-                    ...formData,
-                    cep
-                },
-                cartItems,
-                total
-            }
-        });
+        try {
+            // 1. Preparar os dados do pedido
+            const pedidoData = {
+                usuario_id: user.id,
+                itens: cartItems.map(item => ({
+                    id: item.id,
+                    quantidade: item.quantidade,
+                    valor: item.valor
+                })),
+                endereco_entrega: `${formData.rua}, ${formData.numero} - ${formData.bairro}`,
+                forma_pagamento: 'cartão' // Você pode pegar isso da tela de pagamento
+            };
+
+            // 2. Enviar para o backend
+            const response = await axios.post('http://localhost:3001/pedidos', pedidoData, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            // 3. Limpar o carrinho após sucesso
+            localStorage.removeItem('carrinho');
+            setCartItems([]);
+
+            // 4. Navegar para o comprovante com os dados
+            navigate('/comprovante', {
+                state: {
+                    pedido: response.data,
+                    cliente: {
+                        nome: formData.nome
+                    },
+                    endereco: {
+                        ...formData,
+                        cep
+                    },
+                    cartItems,
+                    total: response.data.valor_total
+                }
+            });
+
+        } catch (error) {
+            console.error('Erro ao finalizar pedido:', error);
+            alert('Erro ao finalizar pedido. Tente novamente.');
+        }
     };
 
     return (
@@ -91,7 +130,7 @@ export function Endereco() {
                                     required
                                     value={cep}
                                     onChange={handleCepChange}
-                                    maxLength={8}
+                                    maxLength={7}
                                     pattern="\d{8}"
                                     title="Digite exatamente 8 dígitos numéricos"
                                     className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
