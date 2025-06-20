@@ -16,6 +16,7 @@ import { AdminRoute } from './components/AdminRoute';
 import { Pagamento } from './pages/Pagamento';
 import { Endereco } from './pages/Endereco';
 import { Comprovante } from './pages/Comprovante';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 
 function AppRoutes() {
@@ -40,7 +41,11 @@ function AppRoutes() {
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/carrinho" element={<Carrinho />} />
         <Route path="/quemsomosnos" element={<Quemsomos />} />
-        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/perfil" element={
+            <ProtectedRoute>
+            <Perfil />
+            </ProtectedRoute>
+        } />
         <Route path="/mouse" element={<Mouse />} />
         <Route path="/teclado" element={<Teclado />} />
         <Route path="/monitor" element={<Monitor />} />

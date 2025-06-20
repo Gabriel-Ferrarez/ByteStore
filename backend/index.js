@@ -280,3 +280,32 @@ app.delete('/produtos/:id', async (req, res) => {
     res.status(500).json({ error: 'Erro ao excluir produto' });
   }
 });
+
+app.get('/usuario/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Busca dados básicos do usuário
+    const [usuario] = await db.query('SELECT * FROM usuarios WHERE id = ?', [id]);
+    
+    if (usuario.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    
+    // Busca dados adicionais do cliente (se existirem)
+    const [cliente] = await db.query('SELECT * FROM clientes WHERE usuario_id = ?', [id]);
+    
+    const response = {
+      ...usuario[0],
+      cliente: cliente.length > 0 ? cliente[0] : null
+    };
+    
+    // Remove a senha antes de enviar
+    delete response.senha;
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    res.status(500).json({ error: 'Erro ao buscar usuário' });
+  }
+});

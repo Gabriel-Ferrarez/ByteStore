@@ -38,7 +38,7 @@ export function Header() {
           </ul>
 
           <div className="flex gap-4 ml-6">
-            <Link to="/perfil"><FaUser size={24} className="text-white" /></Link>
+            <Link to={usuario ? "/perfil" : "/login"}><FaUser size={24} className="text-white" /></Link>
             <Link to="/carrinho"><FaShoppingCart size={28} className="text-white" /></Link>
           </div>
         </nav>
