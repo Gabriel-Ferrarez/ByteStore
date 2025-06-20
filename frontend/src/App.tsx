@@ -17,7 +17,7 @@ import { Pagamento } from './pages/Pagamento';
 import { Endereco } from './pages/Endereco';
 import { Comprovante } from './pages/Comprovante';
 import { ProtectedRoute } from './components/ProtectedRoute';
-
+import { SearchResults } from './pages/SearchResults';
 
 function AppRoutes() {
   const location = useLocation();
@@ -31,6 +31,7 @@ function AppRoutes() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/produto/:id" element={<Produto />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro-produto" element={
