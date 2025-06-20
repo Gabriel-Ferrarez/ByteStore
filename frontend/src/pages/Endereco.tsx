@@ -1,6 +1,6 @@
 import { Footer } from '../components/Footer';
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 
 export function Endereco() {
@@ -15,7 +15,6 @@ export function Endereco() {
         complemento: ''
     });
 
-    // Obter itens do carrinho do localStorage ou do state da rota
     const [cartItems, setCartItems] = useState<any[]>(() => {
         const savedCart = localStorage.getItem('carrinho');
         return savedCart ? JSON.parse(savedCart) : [];
@@ -29,82 +28,103 @@ export function Endereco() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
         
-        if (cep.length !== 8) {
-            alert('CEP deve conter 8 dígitos');
-            return;
-        }
-
-        if (!formData.nome || !formData.rua || !formData.numero || !formData.bairro) {
-            alert('Por favor, preencha todos os campos obrigatórios');
-            return;
-        }
-
-        const user = JSON.parse(localStorage.getItem('usuario') || 'null');
-        if (!user) {
-            alert('Usuário não autenticado');
-            return;
-        }
-
-        try {
-            // 1. Preparar os dados do pedido
-            const pedidoData = {
-                usuario_id: user.id,
-                itens: cartItems.map(item => ({
-                    id: item.id,
-                    quantidade: item.quantidade,
-                    valor: item.valor
-                })),
-                endereco_entrega: `${formData.rua}, ${formData.numero} - ${formData.bairro}`,
-                forma_pagamento: 'cartão' // Você pode pegar isso da tela de pagamento
-            };
-
-            // 2. Enviar para o backend
-            const response = await axios.post('http://localhost:3001/pedidos', pedidoData, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            // 3. Limpar o carrinho após sucesso
-            localStorage.removeItem('carrinho');
-            setCartItems([]);
-
-            // 4. Navegar para o comprovante com os dados
-            navigate('/comprovante', {
-                state: {
-                    pedido: response.data,
-                    cliente: {
-                        nome: formData.nome
-                    },
-                    endereco: {
-                        ...formData,
-                        cep
-                    },
-                    cartItems,
-                    total: response.data.valor_total
-                }
-            });
-
-        } catch (error) {
-            console.error('Erro ao finalizar pedido:', error);
-            alert('Erro ao finalizar pedido. Tente novamente.');
+        if (name === 'numero') {
+            const numericValue = value.replace(/\D/g, '');
+            setFormData(prev => ({
+                ...prev,
+                [name]: numericValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
         }
     };
+
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (cep.length !== 8) {
+        alert('CEP deve conter exatamente 8 dígitos');
+        return;
+    }
+
+    if (!formData.nome || !formData.rua || !formData.numero || !formData.bairro) {
+        alert('Por favor, preencha todos os campos obrigatórios');
+        return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('usuario') || 'null');
+    if (!user) {
+        alert('Usuário não autenticado');
+        return;
+    }
+
+    try {
+        const pedidoData = {
+            usuario_id: user.id,
+            itens: cartItems.map(item => ({
+                id: item.id,
+                quantidade: item.quantidade,
+                valor: item.valor
+            })),
+            endereco_entrega: {
+                cep,
+                rua: formData.rua,
+                numero: formData.numero,
+                bairro: formData.bairro,
+                complemento: formData.complemento,
+                nome: formData.nome
+            },
+            forma_pagamento: 'cartão'
+        };
+
+        const response = await axios.post('http://localhost:3001/pedidos', pedidoData, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        localStorage.removeItem('carrinho');
+        setCartItems([]);
+
+        navigate('/comprovante', {
+            state: {
+                pedido: response.data,
+                cliente: {
+                    nome: formData.nome
+                },
+                endereco: {
+                    ...formData,
+                    cep
+                },
+                cartItems,
+                total: response.data.valor_total
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro ao finalizar pedido:', error);
+        alert('Erro ao finalizar pedido. Tente novamente.');
+    }
+};
 
     return (
         <div className='flex flex-col items-center min-h-screen'>
             <div className="flex-grow w-full">
                 <div className="flex flex-col gap-8 p-8 w-[75%] mx-auto">
-                    <h1 className='text-4xl font-bold'>Informações de Entrega</h1>
+                    <div className="flex justify-between items-center">
+                        <h1 className='text-4xl font-bold'>Informações de Entrega</h1>
+                        <Link 
+                            to="/perfil" 
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            Voltar ao Perfil
+                        </Link>
+                    </div>
+                    
                     <div className="flex flex-col gap-6 bg-white p-8 rounded-lg shadow-sm">
                         <h2 className="text-2xl font-semibold mb-4">Dados do Destinatário</h2>
                         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
@@ -130,14 +150,14 @@ export function Endereco() {
                                     required
                                     value={cep}
                                     onChange={handleCepChange}
-                                    maxLength={7}
+                                    maxLength={8}
                                     pattern="\d{8}"
                                     title="Digite exatamente 8 dígitos numéricos"
                                     className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Digite o CEP (apenas números)"
+                                    placeholder="Digite o CEP (8 dígitos)"
                                 />
                                 {cep.length > 0 && cep.length < 8 && (
-                                    <p className="text-sm text-red-500">CEP deve conter 8 dígitos</p>
+                                    <p className="text-sm text-red-500">CEP deve conter exatamente 8 dígitos</p>
                                 )}
                             </div>
                             <div className="flex flex-col gap-2">
@@ -165,6 +185,7 @@ export function Endereco() {
                                         onChange={handleInputChange}
                                         className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Nº"
+                                        inputMode="numeric"
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
@@ -193,7 +214,13 @@ export function Endereco() {
                                     placeholder="Apartamento, bloco, referência, etc."
                                 />
                             </div>
-                            <div className="flex justify-end mt-4">
+                            <div className="flex justify-between mt-4">
+                                <Link 
+                                    to="/perfil" 
+                                    className="bg-gray-200 text-gray-800 py-3 px-8 rounded-lg hover:bg-gray-300 transition"
+                                >
+                                    Voltar
+                                </Link>
                                 <button 
                                     type="submit"
                                     className="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition"

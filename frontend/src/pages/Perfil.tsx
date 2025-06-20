@@ -1,5 +1,5 @@
 import { Footer } from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -8,7 +8,6 @@ interface Usuario {
     nome: string;
     email: string;
     tipo: string;
-    // Adicione outros campos conforme necessário
 }
 
 interface Cliente {
@@ -54,11 +53,14 @@ export function Perfil() {
 
         setUsuario(user);
         
-        // Buscar dados adicionais do usuário
         async function fetchUserDetails() {
             try {
-                const response = await axios.get(`http://localhost:3001/usuario/${user.id}`);
-                setCliente(response.data.cliente);
+                const response = await axios.get(`http://localhost:3001/usuario/${user.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setCliente(response.data.cliente || null);
                 setLoading(prev => ({ ...prev, usuario: false }));
             } catch (error) {
                 console.error('Erro ao buscar detalhes do usuário:', error);
@@ -66,11 +68,15 @@ export function Perfil() {
             }
         }
 
-        // Buscar pedidos do usuário
+
         async function fetchUserOrders() {
             try {
-                const response = await axios.get(`http://localhost:3001/usuario/${user.id}/pedidos`);
-                setPedidos(response.data);
+                const response = await axios.get(`http://localhost:3001/usuario/${user.id}/pedidos`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setPedidos(response.data || []);
                 setLoading(prev => ({ ...prev, pedidos: false }));
             } catch (error) {
                 console.error('Erro ao buscar pedidos:', error);
@@ -98,7 +104,7 @@ export function Perfil() {
     }
 
     if (!usuario) {
-        return null;
+        return <div className="min-h-screen bg-gray-100"></div>;
     }
 
     if (loading.usuario || loading.pedidos) {
@@ -115,7 +121,15 @@ export function Perfil() {
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
             <main className="flex-grow container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold mb-6">Meu Perfil</h1>
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold">Meu Perfil</h1>
+                    <Link 
+                        to="/" 
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                        Voltar à Loja
+                    </Link>
+                </div>
 
                 <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col md:flex-row md:space-x-8">
                     <div className="flex-shrink-0 text-center md:text-left">
@@ -147,7 +161,7 @@ export function Perfil() {
                                 {cliente && (
                                     <>
                                         {cliente.cep && (
-                                            <div>
+                                            <div className="sm:col-span-2">
                                                 <p className="font-medium">Endereço:</p>
                                                 <p>
                                                     {cliente.rua && `${cliente.rua}, `}
@@ -165,67 +179,59 @@ export function Perfil() {
                             </div>
                         </section>
 
-                        {/* Seção opcional - pode comentar ou remover se não tiver os dados */}
-                        {/*
                         <section>
-                            <h3 className="text-lg font-bold mb-2">Cartão cadastrado</h3>
-                            <div className="bg-gray-50 p-4 rounded-lg border text-sm">
-                                <p>Nenhum cartão cadastrado</p>
-                            </div>
-                        </section>
-                        */}
-
-                        <section>
-                           <h3 className="text-lg font-bold mb-2">Últimos pedidos</h3>
-                    {pedidos.length === 0 ? (
-                            <div className="text-sm text-gray-700">
-                            <p>Nenhum pedido encontrado. Faça seu primeiro pedido!</p>
-                            <Link to="/" className="text-blue-600 hover:underline">
-                                Ir para a loja
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {pedidos.map((pedido) => (
-                                <div key={pedido.id} className="border rounded-lg p-4">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="font-semibold">Pedido #{pedido.id}</p>
-                                            <p className="text-sm text-gray-600">
-                                                {formatDate(pedido.data_pedido)} - {pedido.status}
-                                            </p>
-                                        </div>
-                                        <p className="font-bold">
-                                            {pedido.valor_total.toLocaleString('pt-BR', {
-                                                style: 'currency',
-                                                currency: 'BRL'
-                                            })}
-                                        </p>
-                                    </div>
-                                    
-                                    <div className="mt-2 border-t pt-2">
-                                        <h4 className="text-sm font-medium mb-1">Itens:</h4>
-                                        <ul className="text-sm space-y-1">
-                                            {pedido.itens.map((item, index) => (
-                                                <li key={index}>
-                                                    {item.quantidade}x {item.nome} - 
-                                                    {(item.preco_unitario * item.quantidade).toLocaleString('pt-BR', {
+                            <h3 className="text-lg font-bold mb-2">Meus pedidos</h3>
+                            {pedidos.length === 0 ? (
+                                <div className="text-sm text-gray-700">
+                                    <p>Nenhum pedido encontrado. Faça seu primeiro pedido!</p>
+                                    <Link to="/" className="text-blue-600 hover:underline">
+                                        Ir para a loja
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {pedidos.map((pedido) => (
+                                        <div key={pedido.id} className="border rounded-lg p-4">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="font-semibold">Pedido #{pedido.id}</p>
+                                                    <p className="text-sm text-gray-600">
+                                                        {formatDate(pedido.data_pedido)} - {pedido.status}
+                                                    </p>
+                                                </div>
+                                                <p className="font-bold">
+                                                    {pedido.valor_total.toLocaleString('pt-BR', {
                                                         style: 'currency',
                                                         currency: 'BRL'
                                                     })}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                                </p>
+                                            </div>
+                                            
+                                            <div className="mt-2 border-t pt-2">
+                                                <h4 className="text-sm font-medium mb-1">Itens:</h4>
+                                                <ul className="text-sm space-y-1">
+                                                    {pedido.itens.map((item, index) => (
+                                                        <li key={index}>
+                                                            {item.quantidade}x {item.nome} - 
+                                                            {(item.preco_unitario * item.quantidade).toLocaleString('pt-BR', {
+                                                                style: 'currency',
+                                                                currency: 'BRL'
+                                                            })}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <Link 
+                                        to="/pedidos" 
+                                        className="text-blue-600 mt-1 cursor-pointer hover:underline"
+                                    >
+                                    
+                                    </Link>
                                 </div>
-                            ))}
-                            <p className="text-blue-600 mt-1 cursor-pointer hover:underline">
-                                Ver todos os pedidos
-                            </p>
-                        </div>
-                    )}
-                </section>
-
+                            )}
+                        </section>
 
                         <div className="mt-4 flex gap-2">
                             <button
@@ -240,5 +246,5 @@ export function Perfil() {
             </main>
             <Footer />
         </div>
-    )
+    );
 }

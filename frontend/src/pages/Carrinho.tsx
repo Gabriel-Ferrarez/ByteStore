@@ -113,7 +113,7 @@ export function Carrinho() {
                                     </div>
                                     <button 
                                         className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-                                        onClick={() => navigate('/endereco', { state: { cartItems } })}
+                                        onClick={() => navigate('/pagamento', { state: { cartItems } })}
                                     >
                                         Finalizar Compra
                                     </button>
