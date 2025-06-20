@@ -15,6 +15,8 @@ import { CadastroProduto } from './pages/CadastroProduto';
 import { AdminRoute } from './components/AdminRoute';
 import { Pagamento } from './pages/Pagamento';
 import { Endereco } from './pages/Endereco';
+import { Comprovante } from './pages/Comprovante';
+
 
 function AppRoutes() {
   const location = useLocation();
@@ -44,6 +46,7 @@ function AppRoutes() {
         <Route path="/monitor" element={<Monitor />} />
         <Route path="/pagamento" element={<Pagamento />} />
         <Route path="/endereco" element={<Endereco />} />
+        <Route path="/comprovante" element={<Comprovante />} />
       </Routes>
     </>
   );

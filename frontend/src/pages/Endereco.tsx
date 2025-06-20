@@ -1,25 +1,64 @@
 import { Footer } from '../components/Footer';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function Endereco() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [cep, setCep] = useState('');
+    const [formData, setFormData] = useState({
+        nome: '',
+        rua: '',
+        numero: '',
+        bairro: '',
+        complemento: ''
+    });
 
     const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const numericValue = e.target.value.replace(/\D/g, '');
-
         const formattedValue = numericValue.slice(0, 8);
         setCep(formattedValue);
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
         if (cep.length !== 8) {
             alert('CEP deve conter 8 dígitos');
             return;
         }
-        navigate('/confirmacao');
+
+        if (!formData.nome || !formData.rua || !formData.numero || !formData.bairro) {
+            alert('Por favor, preencha todos os campos obrigatórios');
+            return;
+        }
+
+        const cartItems = location.state?.cartItems || [];
+        const total = cartItems.reduce(
+            (sum: number, item: any) => sum + (item.valor * item.quantidade), 0
+        );
+
+        navigate('/comprovante', {
+            state: {
+                cliente: {
+                    nome: formData.nome
+                },
+                endereco: {
+                    ...formData,
+                    cep
+                },
+                cartItems,
+                total
+            }
+        });
     };
 
     return (
@@ -37,6 +76,8 @@ export function Endereco() {
                                     id="nome"
                                     name="nome"
                                     required
+                                    value={formData.nome}
+                                    onChange={handleInputChange}
                                     className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Digite o nome de quem vai receber"
                                 />
@@ -67,6 +108,8 @@ export function Endereco() {
                                     id="rua"
                                     name="rua"
                                     required
+                                    value={formData.rua}
+                                    onChange={handleInputChange}
                                     className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Digite o nome da rua"
                                 />
@@ -79,6 +122,8 @@ export function Endereco() {
                                         id="numero"
                                         name="numero"
                                         required
+                                        value={formData.numero}
+                                        onChange={handleInputChange}
                                         className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Nº"
                                     />
@@ -90,6 +135,8 @@ export function Endereco() {
                                         id="bairro"
                                         name="bairro"
                                         required
+                                        value={formData.bairro}
+                                        onChange={handleInputChange}
                                         className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Digite o bairro"
                                     />
@@ -101,6 +148,8 @@ export function Endereco() {
                                     type="text"
                                     id="complemento"
                                     name="complemento"
+                                    value={formData.complemento}
+                                    onChange={handleInputChange}
                                     className="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Apartamento, bloco, referência, etc."
                                 />
@@ -110,7 +159,7 @@ export function Endereco() {
                                     type="submit"
                                     className="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition"
                                 >
-                                    Continuar
+                                    Finalizar Compra
                                 </button>
                             </div>
                         </form>
