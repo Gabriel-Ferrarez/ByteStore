@@ -119,6 +119,13 @@ byteStore/
 
 ---
 
+## 📽️ Apresentação do Projeto
+
+Confira a apresentação completa do projeto ByteStore no YouTube:
+
+🔗 [Assista à Apresentação](https://youtu.be/lKWzLgQ7j78)
+
+
 ## 🧪 Contas de Teste
 
 ### Cliente Padrão:

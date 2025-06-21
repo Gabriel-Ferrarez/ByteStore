@@ -290,3 +290,59 @@ app.post('/pedidos', async (req, res) => {
     res.status(500).json({ error: 'Erro ao criar pedido' });
   }
 });
+app.post('/cadastro', async (req, res) => {
+  try {
+    const {
+      email, senha, nome,
+      cpf, data_nascimento, cep,
+      estado, cidade, bairro,
+      rua, numero, complemento
+    } = req.body;
+    
+    // Verifica se usuário já existe
+    const [existingUser] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
+    
+    if (existingUser.length > 0) {
+      return res.status(400).json({ error: 'E-mail já cadastrado' });
+    }
+    
+    // Criptografa a senha
+    const senhaHash = await bcrypt.hash(senha, 10);
+    
+    // Inicia transação
+    const conn = await db.getConnection();
+    await conn.beginTransaction();
+    
+    try {
+      // Insere usuário
+      const [usuarioResult] = await conn.query(
+        'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)',
+        [nome, email, senhaHash]
+      );
+      
+      const usuarioId = usuarioResult.insertId;
+      
+      // Insere cliente
+      await conn.query(
+        `INSERT INTO clientes 
+        (usuario_id, cpf, data_nascimento, cep, estado, cidade, bairro, rua, numero, complemento)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [usuarioId, cpf, data_nascimento, cep, estado, cidade, bairro, rua, numero, complemento]
+      );
+      
+      await conn.commit();
+      conn.release();
+      
+      res.json({ success: true });
+      
+    } catch (error) {
+      await conn.rollback();
+      conn.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    console.error('Erro no cadastro:', error);
+    res.status(500).json({ error: 'Erro no servidor' });
+  }
+});
