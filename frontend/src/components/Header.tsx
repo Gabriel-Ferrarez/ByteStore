@@ -1,6 +1,5 @@
 import { FaShoppingCart, FaUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import { Dropdown } from '../components/Dropdown';
 import { useState } from 'react';
 
 export function Header() {
@@ -36,7 +35,7 @@ export function Header() {
           <ul className="flex gap-4 text-sm font-semibold text-white items-center">
             <li><Link to="/">INÍCIO</Link></li>
             <li>|</li>
-            <li><Dropdown /></li>
+            <li><Link to = "">CAREGORIAS</Link></li>
             <li>|</li>
             <li><Link to="/quemsomosnos">QUEM SOMOS NÓS</Link></li>
 
