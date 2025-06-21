@@ -123,13 +123,13 @@ byteStore/
 
 ### Cliente Padrão:
 
-- **Email:** cliente@teste.com  
-- **Senha:** 123456
+- **Email:** gabrielferrarez77@gmail.com  
+- **Senha:** 200612
 
 ### Administrador:
 
-- **Email:** admin@teste.com  
-- **Senha:** admin123
+- **Email:** gabrielferrarez77@gmail.com  
+- **Senha:** admin789
 
 ---
 
